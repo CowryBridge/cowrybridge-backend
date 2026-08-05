@@ -1,27 +1,24 @@
 import { Router } from "express";
+import { listPools, getPool } from "../lib/poolService.js";
 
 const router = Router();
 
-// TODO: replace with real Soroban contract reads via stellar-sdk once
-// cowrybridge-contracts is deployed to testnet.
-const mockPools = [
-  {
-    id: "pool_demo",
-    beneficiary: "GXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    targetAmount: 1000,
-    currentAmount: 250,
-    released: false,
-  },
-];
-
-router.get("/", (_req, res) => {
-  res.json(mockPools);
+router.get("/", async (_req, res, next) => {
+  try {
+    res.json(await listPools());
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.get("/:id", (req, res) => {
-  const pool = mockPools.find((p) => p.id === req.params.id);
-  if (!pool) return res.status(404).json({ error: "pool not found" });
-  res.json(pool);
+router.get("/:id", async (req, res, next) => {
+  try {
+    const pool = await getPool(req.params.id);
+    if (!pool) return res.status(404).json({ error: "pool not found" });
+    res.json(pool);
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default router;
