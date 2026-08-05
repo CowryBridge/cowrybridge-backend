@@ -12,10 +12,11 @@ npm run dev
 - `src/config.js` — env-driven config
 - `src/routes/` — one file per resource (`health.js`, `pools.js`)
 - `src/middleware/` — request logging, error handling
-- `src/lib/` — business logic (Stellar/Soroban reads live here, currently mocked)
+- `src/lib/` — business logic: reads pool state from, and builds unsigned
+  transactions against, the deployed `cowrybridge-contracts` contract via
+  `@stellar/stellar-sdk`
 
 ## Next steps
 
-- Replace `src/lib/poolService.js` mock data with real Soroban contract
-  reads via `@stellar/stellar-sdk`, once `CONTRACT_ID` is set in `.env`
-- Add input validation on POST routes once contribute/create endpoints exist
+- Set `CONTRACT_ID` in `.env` once the contract is deployed to testnet
+  (see `cowrybridge-docs/deployment.md`)
