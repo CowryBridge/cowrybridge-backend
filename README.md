@@ -1,7 +1,12 @@
 # cowrybridge-backend
 
-API layer for CowryBridge. Indexes Stellar/Soroban pool state and serves the
-frontend.
+🟢 **Live on Stellar testnet:** talks to contract [`CBFD…BF5XV`](https://stellar.expert/explorer/testnet/contract/CBFDXLLKXHGMPRRKE4L67LZFUEVYY33FGCBS4PSB2O5AG3KZBH5BF5XV) —
+see [`cowrybridge-docs/deployment.md`](https://github.com/CowryBridge/cowrybridge-docs/blob/main/deployment.md)
+for a verified end-to-end run.
+
+API layer for CowryBridge: reads live pool state from the deployed Soroban
+contract and builds unsigned transactions for the frontend to sign — it
+never holds a private key.
 
 ## Setup
 
@@ -25,5 +30,6 @@ npm run dev
 The backend only ever builds transactions — it never holds a private key or
 signs anything.
 
-Part of the [CowryBridge](https://github.com/cowrybridge) organization —
-see `cowrybridge-docs` for the full architecture.
+Part of the [CowryBridge](https://github.com/CowryBridge) organization —
+see [`cowrybridge-docs`](https://github.com/CowryBridge/cowrybridge-docs) for
+the full architecture.
