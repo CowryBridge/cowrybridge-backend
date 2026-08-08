@@ -22,6 +22,8 @@ npm run dev
 - `GET /pools` — list savings pools (reads live contract state via
   `@stellar/stellar-sdk`; requires `CONTRACT_ID` in `.env`)
 - `GET /pools/:id` — get a single pool
+- `GET /pools/:id/history` — recent create/contribute/release activity for
+  the pool, newest first, read from the contract's on-chain events
 - `POST /pools` — build an unsigned `create_pool` transaction for the
   frontend to sign with the beneficiary's wallet and submit
 - `POST /pools/:id/contribute` — build an unsigned `contribute` transaction

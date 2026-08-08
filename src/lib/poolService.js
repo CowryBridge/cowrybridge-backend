@@ -26,6 +26,31 @@ function mapPool(native) {
   };
 }
 
+// Maps a raw Soroban event (as returned by server.getEvents) into the shape
+// the frontend renders. All three contract events (pool_created, contribute,
+// released — see cowrybridge-contracts/src/events.rs) publish the same
+// (Address, i128) data shape, just with a different topic and meaning for
+// the amount, so one mapper covers all of them.
+const EVENT_LABELS = {
+  created: "created",
+  contrib: "contributed",
+  released: "released",
+};
+
+function mapEvent(event) {
+  const topic = StellarSdk.scValToNative(event.topic[0]);
+  const [party, amountRaw] = StellarSdk.scValToNative(event.value);
+
+  return {
+    type: EVENT_LABELS[topic] || topic,
+    address: typeof party === "string" ? party : party.toString(),
+    amount: Number(amountRaw),
+    ledger: event.ledger,
+    ledgerClosedAt: event.ledgerClosedAt,
+    txHash: event.txHash,
+  };
+}
+
 function buildCallTx(sourceAccount, method, args) {
   const contract = new StellarSdk.Contract(config.contractId);
   return new StellarSdk.TransactionBuilder(sourceAccount, {
@@ -61,6 +86,25 @@ export async function listPools() {
 export async function getPool(id) {
   if (!config.contractId || id !== config.contractId) return null;
   return simulateGetPool();
+}
+
+// Recent create/contribute/release activity for a pool, newest first. This
+// is what lets a contributor see "who's put in what" without needing a
+// block explorer — the contract was already emitting these events, they
+// just weren't surfaced anywhere until now.
+export async function getPoolHistory(id, { limit = 20 } = {}) {
+  if (!config.contractId || id !== config.contractId) return [];
+
+  const latestLedger = await server.getLatestLedger();
+  const startLedger = Math.max(1, latestLedger.sequence - config.eventLookbackLedgers);
+
+  const { events } = await server.getEvents({
+    startLedger,
+    filters: [{ type: "contract", contractIds: [config.contractId] }],
+    limit,
+  });
+
+  return events.map(mapEvent).reverse();
 }
 
 export async function buildCreatePoolTx({ beneficiary, targetAmount, token }) {

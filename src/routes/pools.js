@@ -4,6 +4,7 @@ import { config } from "../config.js";
 import {
   listPools,
   getPool,
+  getPoolHistory,
   buildCreatePoolTx,
   buildContributeTx,
 } from "../lib/poolService.js";
@@ -27,6 +28,19 @@ router.get("/:id", async (req, res, next) => {
     const pool = await getPool(req.params.id);
     if (!pool) return res.status(404).json({ error: "pool not found" });
     res.json(pool);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Recent create/contribute/release activity for the pool, newest first.
+router.get("/:id/history", async (req, res, next) => {
+  try {
+    if (!config.contractId || req.params.id !== config.contractId) {
+      return res.status(404).json({ error: "pool not found" });
+    }
+    const limit = Math.min(Number(req.query.limit) || 20, 100);
+    res.json(await getPoolHistory(req.params.id, { limit }));
   } catch (err) {
     next(err);
   }

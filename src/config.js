@@ -14,4 +14,11 @@ export const config = {
   get contractId() {
     return process.env.CONTRACT_ID || null;
   },
+  // How far back (in ledgers) to look when fetching pool activity history.
+  // ~5s/ledger, so the default of 17280 is roughly the last 24h. Soroban RPC
+  // providers only retain events for a limited recent window regardless
+  // (commonly ~7 days) — this is "recent activity", not a full audit log.
+  get eventLookbackLedgers() {
+    return Number(process.env.EVENT_LOOKBACK_LEDGERS) || 17280;
+  },
 };
